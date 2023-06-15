@@ -1,3 +1,6 @@
+.idea
+.parcel-cache
+
 # Logs
 logs
 *.log
