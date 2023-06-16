@@ -29,7 +29,6 @@ class ViewModel {
    * @param bombType
    */
   onShootStart(bombType) {
-    console.log('shoot start');
     this.timer = setInterval(() => {
       this.tickProgress();
     }, this.interval);
@@ -42,7 +41,6 @@ class ViewModel {
    * @param bombType
    */
   onBombLaunched(bombType) {
-    console.log('bomb launched');
     clearInterval(this.timer); // Stop counting shooting progress
 
     // Shooting without bounds checking
@@ -80,7 +78,6 @@ class ViewModel {
   tickProgress() {
     if (this.power < 100) {
       ++this.power;
-      console.log(`countProgress ${this.power}`);
       Signals.shootProgress.dispatch(this.power);
     }
   }

@@ -10,7 +10,6 @@ class ProgressBarHealth extends ProgressBar {
 
   set progress(value) {
     // For the debugging health bar here
-    console.log(`health updatedd : ${value}`);
     super.progress = value;
   }
 }

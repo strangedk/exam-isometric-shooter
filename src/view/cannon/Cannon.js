@@ -15,14 +15,23 @@ class Cannon extends PIXI.Sprite {
     this.health = null;
     this.texture = PIXI.Texture.from(this.url);
 
-    this
-      .addHealthProgress(0,-20)
-      .addBomb(140,-30);
+    this.addHealthProgress(0,-20)
+
+    // Just block the enemy cannon shooting.
+    // But I'd better make a possibility to Enemy also shooting Hero
+    // So, please read this kinda temporary crutch, just to finish the task here
+    // In the real project it would be the different approach
+    // Or at least, I'd use some options like this cannon is active or not.
+    // And both of the cannons would be shooting, for sure.
+    cannonType === CannonType.HERO && (
+      this.addBomb(150,-30),
+      Signals.shoot.add(this.shoot, this)
+    );
 
     Signals.updateHealth.add(this.updateHealth, this);
-    Signals.shoot.add(this.shoot, this);
   }
 
+  // region #Signal handlers
   updateHealth({cannonType, health}) {
     if (cannonType === this.type) {
       this.health.progress = health;
@@ -32,7 +41,9 @@ class Cannon extends PIXI.Sprite {
   shoot({bombType, power}) {
     this.bomb.shoot({bombType, power});
   }
+  // endregion
 
+  // region #Components creation
   addBomb(x,y) {
     this.bomb = new CannonShoot();
     this.bomb.position.set(x,y);
@@ -56,6 +67,7 @@ class Cannon extends PIXI.Sprite {
 
     return this;
   }
+  // endregion
 
   get url() {
     switch (this.type) {
