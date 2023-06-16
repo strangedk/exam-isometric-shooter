@@ -78,15 +78,15 @@ class Game {
   addPlayers() {
     const {app} = this;
 
-    const hero = new Cannon(CannonType.HERO);
-    hero.position.set(130, 180)
-    hero.scale.set(0.5);
-
     const enemy = new Cannon(CannonType.ENEMY);
     enemy.position.set(450, 50)
     enemy.scale.set(0.4);
 
-    app.stage.addChild(hero, enemy);
+    const hero = new Cannon(CannonType.HERO);
+    hero.position.set(130, 180)
+    hero.scale.set(0.5);
+
+    app.stage.addChild(enemy, hero);
 
     return this;
   }

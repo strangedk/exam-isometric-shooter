@@ -10,8 +10,8 @@ class ViewModel {
 
     // Mock data. This one stored in the frontend model
     this.hit = {
-      from: 40,
-      to: 60,
+      from: 50,
+      to: 80,
     }
 
     // Mock data for the starting health props for the Cannons.

@@ -10,3 +10,5 @@ I've using the Parcel bundler, because I'd try to something less complicated tha
 Therefore, the assets are stored in the dist right now. But I know, that it should be copied with a Parcel copy plugin.
 
 Some things are using mock/hardcode data, but that implies that in the real game they should be loaded from the server or at least should be splitted into the different datas with an access by enums/interfaces and so on. 
+
+Also I know that is would be better to place all of the assets into the one spritesheet and even save the texturePacker (.tps) project. But again, it's just a demo code.

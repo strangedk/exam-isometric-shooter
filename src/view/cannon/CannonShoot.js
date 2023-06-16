@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js';
 import BombType from "../../model/BombType";
+import {Spine} from "pixi-spine";
 
 class CannonShoot extends PIXI.Container {
   constructor() {
@@ -9,11 +10,12 @@ class CannonShoot extends PIXI.Container {
   }
 
   shoot({bombType, power}) {
-    this.removeChildren();
+    if (this.bomb)
+      this.removeChild(this.bomb);
+
     // Here is object pool/Fabric required.
     // I've just skip it consciously in this case, but I know about that.
-    if (this.bomb)
-      delete this.bomb;
+
     this.bomb = this.createBomb(bombType);
     this.addChild(this.bomb);
 
@@ -23,9 +25,12 @@ class CannonShoot extends PIXI.Container {
   implShoot(power) {
     const startX = 0;
     const startY = 0;
-    // Adjust the power and half, to keep the bounds before and behind the cannon
-    const endX = 600 / 100 * (power + power/3);
-    const endY = -150 / 100 * (power + power/3);
+    // Adjust the power and half and offsets to keep the bounds before and behind the cannon
+    // Anyway I think that hitTest is a more proper way, for instance,
+    // - When the enemy cannon is can be moved by player/pc
+    const offsetY = power < 50 ? power/2 : power+30;
+    const endX = 600 / 100 * (power + power/2);
+    const endY = -150 / 100 - offsetY;
 
     const curveHeight = -50; // Height in pixels depends on the power incoming
     const curveDuration = 50; // ms
@@ -42,7 +47,7 @@ class CannonShoot extends PIXI.Container {
       // Convert the progress from 0..1 to -1..1
       // To make the curve (in decard 4) Y decreasing, and then increasing
       const adjustedProgress = progress * 2 - 1;
-      return endY + height - Math.pow(adjustedProgress, 2) * height;
+      return endY + height - (adjustedProgress ** 2) * height;
     }
 
     const animate = () => {
@@ -68,10 +73,45 @@ class CannonShoot extends PIXI.Container {
 
       if (progressCurrent >= progressFinal) {
         clearInterval(timeIntervalID);
+        this.createExplosion();
       }
     }
 
     timeIntervalID = setInterval(() => animate(), 10);
+  }
+
+  explode() {
+    // The animation is obviously should be a different depending by type of the bomb.
+    // But I believe that you understand, why it's the same now
+    // assets/animations/explosion/ExplosionAnim.json
+    // animationName: ExplosionBattleJet
+    this.bomb.visible = false;
+
+    const offset = 50;
+    this.spine.visible = true
+    this.spine.position.set(this.bomb.x - offset, this.bomb.y - offset);
+    this.spine.state.addListener({ complete: () => this.explodeFinished() });
+    this.spine.state.setAnimation(0,'ExplosionBattleJet', false);
+  }
+
+  explodeFinished() {
+    this.spine.visible = false;
+    this.spine.state.clearTrack(0);
+    this.spine.skeleton.setToSetupPose();
+  }
+
+  createExplosion() {
+    if (!this.spine) {
+      PIXI.Assets.loader
+        .load('assets/animations/explosion/ExplosionAnim.json').then(data => {
+          this.spine = new Spine(data.spineData);
+          this.addChild(this.spine);
+          this.spine.visible = false;
+          this.explode();
+        });
+    } else {
+      this.explode();
+    }
   }
 
   createBomb(bombType) {
